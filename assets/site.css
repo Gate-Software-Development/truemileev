@@ -1,65 +1,98 @@
-/* TrueMile EV — the public page. Self-hosted, no font or script from anywhere else. */
-:root{
+/* TrueMile EV — the public page. Self-hosted, no font or script from anywhere else.
+   Two themes, the app's own: deep navy after dark, warm ivory by day. */
+:root, :root[data-theme="dark"]{
   --bg:#070c16; --card:#101a2c; --card2:#0c1524; --ink:#e8eef7; --muted:#8fa1b8; --dim:#5d6e85;
   --line:#1d2b42; --cyan:#37b6ff; --green:#00e676; --blue:#2e9be6; --amber:#ffb300; --red:#ff5252;
+  --glow:rgba(30,110,190,.22); --glow2:rgba(0,180,120,.07); --shadow:rgba(0,0,0,.5);
+  --bezel:#16202f;
+  /* the app's own nav colours, one per screen */
+  --c-board:#00e676; --c-charge:#00b0ff; --c-live:#ff1744; --c-map:#ff6d00; --c-report:#ffd600;
+  --c-wear:#37b6ff; --c-auto:#b388ff;
+}
+:root[data-theme="light"]{
+  --bg:#f5f1e8; --card:#ffffff; --card2:#ede8db; --ink:#1b2330; --muted:#5c6675; --dim:#8a93a3;
+  --line:#ded7c7; --cyan:#0e7490; --green:#15803d; --blue:#2563eb; --amber:#b45309; --red:#b91c1c;
+  --glow:rgba(14,116,144,.10); --glow2:rgba(21,128,61,.06); --shadow:rgba(90,80,60,.18);
+  --bezel:#d9d2c2;
+  --c-board:#15803d; --c-charge:#0369a1; --c-live:#b91c1c; --c-map:#c2410c; --c-report:#a16207;
+  --c-wear:#0e7490; --c-auto:#6d28d9;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);
   line-height:1.6;overflow-x:hidden;
-  background-image:radial-gradient(900px 520px at 72% -12%,rgba(30,110,190,.22),transparent 60%),
-                   radial-gradient(760px 440px at 8% 26%,rgba(0,180,120,.07),transparent 60%);}
+  background-image:radial-gradient(900px 520px at 72% -12%,var(--glow),transparent 60%),
+                   radial-gradient(760px 440px at 8% 26%,var(--glow2),transparent 60%);}
 a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+.wrap{max-width:1060px;margin:0 auto;padding:0 16px}
 
-/* ── splash — the app's own opening, once per visit ─────────────────────────── */
+/* ── splash ─────────────────────────────────────────────────────────────────── */
 #splash{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:14px;transition:opacity .5s ease,visibility .5s}
+  align-items:center;justify-content:center;gap:14px;transition:opacity .55s ease,visibility .55s}
 #splash.gone{opacity:0;visibility:hidden}
-#splash .mark{width:108px;height:108px}
-#splash .name{font-size:1.5em;font-weight:800;letter-spacing:.6px}
+#splash .mark{width:112px;height:112px}
+#splash .name{font-size:1.6em;font-weight:800;letter-spacing:.6px}
 #splash .name span{background:linear-gradient(92deg,var(--cyan),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
 #splash .tag{color:var(--muted);font-size:.95em}
-.pulse{transform-origin:center;animation:pulse 1.6s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+#splash .skip{color:var(--dim);font-size:.78em;letter-spacing:1px;text-transform:uppercase;margin-top:6px}
+.pulse{transform-origin:center;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.14)}}
 
-/* ── header ─────────────────────────────────────────────────────────────────── */
-header.bar{display:flex;align-items:center;gap:10px;padding:16px 0;flex-wrap:wrap}
-.bar .spacer{flex:1}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:11px;
-  font-weight:700;font-size:.9em;border:1px solid var(--line);color:var(--ink);background:transparent;cursor:pointer}
-.btn:hover{border-color:#2c4268;text-decoration:none}
+/* ── header — one row on a desktop, two tidy rows on a phone ────────────────── */
+header.bar{display:flex;align-items:center;gap:8px;padding:12px 0 4px;flex-wrap:wrap}
+.bar .stores{display:flex;gap:8px;margin-left:auto;flex-wrap:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;
+  border-radius:11px;font-weight:700;font-size:.88em;border:1px solid var(--line);color:var(--ink);
+  background:transparent;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--dim);text-decoration:none}
 .btn.primary{background:linear-gradient(92deg,var(--cyan),var(--green));color:#04121f;border:0}
-.btn.primary:hover{filter:brightness(1.08)}
 .btn[aria-disabled="true"]{opacity:.45;cursor:default}
 .btn svg{width:16px;height:16px;flex:none}
+.btn.icon{padding:9px 11px}
 
-/* ── hero ───────────────────────────────────────────────────────────────────── */
-.hero{text-align:center;padding:10px 0 4px}
-.hero h1{font-size:clamp(1.9em,5vw,2.7em);margin:.1em 0 .1em;letter-spacing:.5px;font-weight:800}
+/* ── title ──────────────────────────────────────────────────────────────────── */
+.hero{text-align:center;padding:4px 0 0}
+.hero h1{font-size:clamp(1.8em,6vw,2.6em);margin:0;letter-spacing:.5px;font-weight:800}
 .hero h1 span{background:linear-gradient(92deg,var(--cyan),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{color:var(--muted);max-width:640px;margin:.3em auto 0}
 
 /* ── 3D carousel ────────────────────────────────────────────────────────────── */
-.stage{position:relative;height:430px;perspective:1300px;margin:18px 0 6px}
+.stage{position:relative;height:456px;perspective:1250px;margin:10px 0 0}
 .ring{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.22,.9,.28,1)}
-.slide{position:absolute;left:50%;top:0;width:210px;height:412px;margin-left:-105px;
+.slide{position:absolute;left:50%;top:0;width:214px;height:440px;margin-left:-107px;
   transition:opacity .5s ease,filter .5s ease;backface-visibility:hidden}
-.slide[data-far="1"]{opacity:.42;filter:saturate(.6)}
-.phone{width:100%;height:100%;border-radius:26px;position:relative;overflow:hidden;
-  background:var(--card2);border:1px solid var(--line);box-shadow:0 18px 44px rgba(0,0,0,.5)}
-.phone .screen{position:absolute;inset:7px;border-radius:20px;background:var(--bg);overflow:hidden;
+.slide[data-far="1"]{opacity:.34;filter:saturate(.55)}
+.phone{width:100%;height:100%;border-radius:28px;position:relative;overflow:hidden;
+  background:var(--bezel);border:1px solid var(--line);box-shadow:0 20px 46px var(--shadow)}
+.phone .screen{position:absolute;inset:6px;border-radius:23px;background:var(--bg);overflow:hidden;
   display:flex;flex-direction:column}
+.phone .shot{position:absolute;inset:6px;border-radius:23px;width:calc(100% - 12px);height:calc(100% - 12px);
+  object-fit:cover;object-position:top center}
 .phone .status{display:flex;justify-content:space-between;padding:6px 10px 2px;font-size:8px;color:var(--dim)}
 .phone .body{flex:1;padding:6px 8px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
-.phone .navbar{display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);
-  padding:5px 2px}
+.phone .navbar{display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);padding:5px 2px}
 .phone .navbar svg{width:11px;height:11px;color:var(--dim)}
-.phone .navbar .on{color:var(--cyan)}
+
+/* a real screenshot covers the drawn screen once it loads; shapes differ per device */
+.watch .face .shot{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;object-fit:cover}
+.watch .fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%}
+.head .display .shot{position:absolute;inset:0;width:100%;height:100%;border-radius:9px;object-fit:cover}
+.head .fallback{display:flex;flex-direction:column;width:100%;height:100%}
+
+/* the watch and the car's own screen are not phones */
 .watch{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.watch .face{width:170px;height:170px;border-radius:50%;background:var(--bg);border:9px solid #16202f;
+.watch .face{width:176px;height:176px;border-radius:50%;background:var(--bg);border:10px solid var(--bezel);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  box-shadow:0 18px 44px rgba(0,0,0,.5)}
+  box-shadow:0 20px 46px var(--shadow)}
+.head{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.head .unit{width:206px;border-radius:14px;background:var(--bezel);border:1px solid var(--line);
+  padding:7px;box-shadow:0 20px 46px var(--shadow)}
+.head .display{border-radius:9px;background:var(--bg);overflow:hidden;aspect-ratio:16/10;
+  display:flex;flex-direction:column}
+.head .hbar{display:flex;gap:5px;align-items:center;padding:5px 6px;border-bottom:1px solid var(--line)}
+.head .hbar svg{width:10px;height:10px;color:var(--dim)}
+.head .vents{display:flex;justify-content:space-between;padding:6px 4px 0}
+.head .vents i{display:block;width:34px;height:5px;border-radius:3px;background:var(--line)}
 
 /* mock-screen parts */
 .t{background:var(--card);border-radius:7px;padding:5px 6px;min-width:0}
@@ -75,56 +108,52 @@ header.bar{display:flex;align-items:center;gap:10px;padding:16px 0;flex-wrap:wra
 .listrow{display:flex;justify-content:space-between;font-size:7.5px;color:var(--muted);
   border-bottom:1px solid var(--line);padding:3px 1px}
 .mapbg{position:absolute;inset:0;background:
-  linear-gradient(90deg,transparent 49%,#16233a 49.5%,#16233a 50.5%,transparent 51%),
-  linear-gradient(0deg,transparent 39%,#16233a 39.5%,#16233a 40.5%,transparent 41%),
-  linear-gradient(72deg,transparent 64%,#16233a 64.4%,#16233a 65.4%,transparent 66%),#0a1322}
+  linear-gradient(90deg,transparent 49%,var(--line) 49.5%,var(--line) 50.5%,transparent 51%),
+  linear-gradient(0deg,transparent 39%,var(--line) 39.5%,var(--line) 40.5%,transparent 41%),
+  linear-gradient(72deg,transparent 64%,var(--line) 64.4%,var(--line) 65.4%,transparent 66%),var(--card2)}
 .pin{position:absolute;width:9px;height:9px;border-radius:50%;border:2px solid var(--bg)}
-.dots{display:flex;gap:4px;justify-content:center;padding-top:3px}
+.dots{display:flex;gap:4px;justify-content:center;padding-top:5px}
 .dots i{width:4px;height:4px;border-radius:50%;background:var(--line);display:block}
 .dots i.on{background:var(--cyan)}
 
-/* ── the app's own nav, as the carousel's control ───────────────────────────── */
-.appnav{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0 0}
-.appnav button{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:74px;
-  padding:9px 8px;border-radius:13px;border:1px solid transparent;background:transparent;
-  color:var(--dim);font:inherit;font-size:.72em;font-weight:700;letter-spacing:.3px;cursor:pointer}
-.appnav button svg{width:19px;height:19px}
-.appnav button:hover{color:var(--muted);border-color:var(--line)}
-.appnav button[aria-selected="true"]{color:var(--cyan);background:rgba(55,182,255,.10);border-color:rgba(55,182,255,.3)}
-.appnav .soon::after{content:"soon";display:block;font-size:.75em;font-weight:600;color:var(--dim);letter-spacing:.4px}
-
-/* ── the write-up under the carousel ───────────────────────────────────────── */
-.readout{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:14px;
-  min-height:190px}
-.readout h2{margin:0 0 2px;font-size:1.3em;letter-spacing:.3px}
-.readout .lede{color:var(--ink);font-size:1.02em;margin:0 0 10px}
-.readout p.detail{color:var(--muted);margin:0 0 12px;max-width:72ch}
-.readout ul{list-style:none;margin:0;padding:0;display:flex;gap:8px;flex-wrap:wrap}
-.readout li{font-size:.84em;color:var(--muted);background:var(--card2);border:1px solid var(--line);
-  border-radius:999px;padding:5px 12px}
-.fade-in{animation:fade .45s ease}
-@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ── the app's own bottom bar, doing the steering ───────────────────────────── */
+.appnav{display:flex;justify-content:center;gap:2px;flex-wrap:wrap;margin:6px 0 0}
+.appnav button{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px;
+  padding:8px 6px;border-radius:16px;border:0;background:transparent;color:var(--dim);
+  font:inherit;font-size:.7em;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:background .2s}
+.appnav button svg{width:22px;height:22px;transition:width .2s,height .2s}
+.appnav button[aria-selected="true"]{color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent);font-weight:700}
+.appnav button[aria-selected="true"] svg{width:26px;height:26px;color:var(--c)}
+.appnav .soon::after{content:"soon";display:block;font-size:.72em;font-weight:600;color:var(--dim);letter-spacing:.4px}
 
 /* ── promises + footer ─────────────────────────────────────────────────────── */
-section{padding:30px 0}
+section{padding:26px 0}
 h3.sec{font-size:.85em;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin:0 0 16px}
-.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
 .promise div{border-left:2px solid var(--green);padding-left:14px}
 .promise b{display:block}
 .promise span{color:var(--muted);font-size:.95em}
-footer{border-top:1px solid var(--line);margin-top:20px;padding:22px 0 42px;color:var(--muted);
+footer{border-top:1px solid var(--line);margin-top:16px;padding:22px 0 40px;color:var(--muted);
   font-size:.9em;text-align:center}
-footer a{margin:0 7px}
+footer a{margin:0 7px;display:inline-block}
 
 @media (max-width:640px){
-  .stage{height:390px}
-  .slide{width:176px;height:350px;margin-left:-88px}
-  .appnav button{min-width:62px;font-size:.68em}
-  .readout{padding:18px}
+  header.bar{padding-bottom:2px}
+  .bar .stores{margin-left:auto}
+  .btn{font-size:.82em;padding:8px 12px}
+  .stage{height:420px}
+  .slide{width:186px;height:404px;margin-left:-93px}
+  .watch .face{width:150px;height:150px}
+  .head .unit{width:180px}
+  .appnav button{min-width:50px;font-size:.66em}
+  .appnav button svg{width:20px;height:20px}
+  .appnav button[aria-selected="true"] svg{width:23px;height:23px}
+}
+@media (max-width:400px){
+  .bar .stores{width:100%;margin-left:0;justify-content:space-between}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .ring{transition:none}
   .pulse{animation:none}
-  .fade-in{animation:none}
 }
