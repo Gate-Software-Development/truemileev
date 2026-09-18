@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrueMile EV — the EV logbook that learns your vehicle</title>
+<meta name="description" content="TrueMile EV connects to your car's OBD adapter and records every drive and charge automatically: true cost per mile, real range, your own charging curve, battery health, and a trip planner built on your driving instead of lab numbers.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M10 12 h18 a20 20 0 0 1 0 40 h-18 z" fill="%231e88d2"/><circle cx="52" cy="32" r="6" fill="%2300e676"/></svg>'>
+<style>
+:root{--bg:#070c16;--card:#101a2c;--ink:#e8eef7;--muted:#8fa1b8;--line:#1d2b42;
+--cyan:#37b6ff;--green:#00e676}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;
+background-image:
+ radial-gradient(900px 500px at 70% -10%,rgba(30,110,190,.22),transparent 60%),
+ radial-gradient(700px 420px at 10% 30%,rgba(0,180,120,.07),transparent 60%);}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+header{padding:78px 0 26px;text-align:center}
+h1{font-size:clamp(1.9em,5vw,2.7em);margin:.2em 0 .1em;letter-spacing:.5px;font-weight:800}
+h1 .g{background:linear-gradient(92deg,var(--cyan),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{color:var(--muted);font-size:1.12em;margin:.4em auto 0;max-width:620px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-block;padding:12px 22px;border-radius:12px;font-weight:700;letter-spacing:.3px}
+.btn.primary{background:linear-gradient(92deg,var(--cyan),var(--green));color:#04121f}
+.btn.primary:hover{text-decoration:none;filter:brightness(1.08)}
+.btn.ghost{border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{text-decoration:none;border-color:#2c4268}
+section{padding:34px 0}
+h2{font-size:.9em;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 20px;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--green))}
+.card h3{margin:.2em 0 .4em;font-size:1.1em}
+.card p{margin:0;color:var(--muted);font-size:.96em}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+ol.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+ol.steps li::before{content:counter(s);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+border-radius:50%;background:rgba(55,182,255,.16);color:var(--cyan);font-weight:800;font-size:.85em;margin-bottom:8px}
+ol.steps b{display:block;margin-bottom:4px}
+ol.steps span{color:var(--muted);font-size:.95em}
+.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.promise div{border-left:2px solid var(--green);padding-left:14px}
+.promise b{display:block}
+.promise span{color:var(--muted);font-size:.95em}
+.note{color:var(--muted);font-size:.92em}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:24px 0 44px;color:var(--muted);font-size:.9em;text-align:center}
+footer a{margin:0 8px}
+</style>
+</head><body>
+<div class="wrap">
+
+<header>
+  <h1>TrueMile <span class="g">EV</span></h1>
+  <p class="tag">The EV logbook that learns your vehicle. It connects to your car's OBD adapter and
+  records every drive and charge on its own — then tells you what they actually cost and how far you
+  can actually go.</p>
+  <div class="cta">
+    <a class="btn primary" href="app.html">Open your dashboard</a>
+    <a class="btn ghost" href="https://play.google.com/store/apps/details?id=com.gateengineering.truemileev">Get it on Google Play</a>
+  </div>
+  <p class="note" style="margin-top:14px">Closed testing. Android, with a Wear OS watch app and Android Auto.</p>
+</header>
+
+<section>
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Every drive, logged by itself</h3><p>Pair a Bluetooth OBD adapter once. From then on the app notices when you drive, records the route, the energy, the temperatures and the speed, and files it — you do nothing.</p></div>
+    <div class="card"><h3>True cost per mile</h3><p>Costs follow the energy you actually paid for, charge by charge, at the price you actually paid. Not an average, not a guess.</p></div>
+    <div class="card"><h3>Your own charging curve</h3><p>Every DC session is recorded power-by-power. The planner uses your curve and your car's behaviour, not a manufacturer's chart.</p></div>
+    <div class="card"><h3>Real range, not lab range</h3><p>Range comes from what your vehicle does in the weather you drive in, at the speeds you drive, with the load you carry.</p></div>
+    <div class="card"><h3>Battery health you can check</h3><p>Usable capacity measured from your own charging sessions, tracked over time, with the quality of each measurement shown.</p></div>
+    <div class="card"><h3>Trip planning that adds up</h3><p>Plan a route and see where you would stop, how long for, and what charge you would arrive with — from your data, not a generic model.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><b>Pair an adapter</b><span>Any Bluetooth ELM327-style OBD adapter. It stays in the car; the app finds it when you get in.</span></li>
+    <li><b>Drive normally</b><span>Trips and charges record themselves in the background. Nothing to start, nothing to stop.</span></li>
+    <li><b>Read the truth</b><span>Cost per mile, efficiency, charging curve, battery health, and reports you can export or hand to an accountant.</span></li>
+  </ol>
+</section>
+
+<section>
+  <h2>How we build</h2>
+  <div class="promise">
+    <div><b>No ads. No trackers.</b><span>Zero analytics SDKs in anything we ship — verified, not promised. This site included: no third-party scripts, no fonts loaded from elsewhere, no tag managers.</span></div>
+    <div><b>Your data is yours.</b><span>Collected only to power your own features. Deletable any time, in the app.</span></div>
+    <div><b>Real data beats ratings.</b><span>The app learns from what you actually do, not what a lab assumed.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Support</h2>
+  <p class="note">Questions, feedback or account requests: <a href="mailto:support@gateeng.com">support@gateeng.com</a>.
+  We read everything — most messages get a reply within a day or two.</p>
+</section>
+
+<footer>
+  <div>
+    <a href="https://gateeng.com/truemile-privacy/">Privacy</a>·
+    <a href="https://gateeng.com/truemile-terms/">Terms</a>·
+    <a href="https://gateeng.com/truemile-privacy/delete/">Delete account</a>·
+    <a href="https://gateeng.com">Gate Engineering</a>
+  </div>
+  <div style="margin-top:10px">© 2026 Gate Engineering LLC</div>
+</footer>
+
+</div>
+</body></html>
