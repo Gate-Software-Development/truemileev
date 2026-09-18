@@ -72,11 +72,31 @@
   };
   // The drawn screen shows FIRST and the photo hides it once it has actually loaded - the other way
   // round leaves an empty frame for as long as the 404 takes.
+  //
+  // Charge and Map cycle through several faces, so they look for charge-2-dark.png first and fall
+  // back to a plain charge-dark.png: one screenshot per screen is enough, and per-face files are
+  // only worth taking if he wants each face to be its own photo.
+  //
+  // A path that 404s is remembered, because the centred screen re-renders every few seconds as it
+  // cycles and an unremembered miss would fetch the same missing file again on every tick.
+  const missing = new Set();
   const framed = (key, i, drawn, cls) => `
-    <img class="shot" src="${shot(key, i)}" alt="" loading="lazy"
-         onload="this.parentNode.querySelector('.fallback').style.display='none'"
-         onerror="this.remove()">
+    <img class="shot" alt="" loading="lazy" data-try="${shot(key, i)}|${shot(key, null)}">
     <div class="fallback ${cls || "screen"}">${drawn}</div>`;
+
+  function wireShots(root) {
+    $$(".shot", root).forEach(img => {
+      const paths = img.dataset.try.split("|").filter((p, i, a) => a.indexOf(p) === i && !missing.has(p));
+      if (!paths.length) { img.remove(); return; }
+      let at = 0;
+      img.onload = () => { const f = img.parentNode.querySelector(".fallback"); if (f) f.style.display = "none"; };
+      img.onerror = () => {
+        missing.add(paths[at]);
+        if (++at < paths.length) img.src = paths[at]; else img.remove();
+      };
+      img.src = paths[0];
+    });
+  }
 
   // ── the drawn screens (the fallback, and what shows until screenshots land) ────────────────
   const navbar = (on) => `<div class="navbar">` +
@@ -247,6 +267,7 @@
       <div class="slide" data-key="${s.key}" style="transform:rotateY(${i * step}deg) translateZ(${radius}px)">
         ${slideInner(s)}
       </div>`).join("");
+    wireShots(ring);
     nav.innerHTML = SCREENS.map((s, i) => `
       <button role="tab" aria-selected="${i === active}" data-i="${i}" style="--c:${s.color}"
               class="${s.soon ? "soon" : ""}" aria-label="${s.label}${s.soon ? ", coming soon" : ""}">
@@ -306,7 +327,7 @@
     if (!Array.isArray(m)) return;
     subIndex[s.key] = ((subIndex[s.key] || 0) + 1) % m.length;
     const slide = $$(".slide", ring)[active];
-    if (slide) slide.innerHTML = slideInner(s);
+    if (slide) { slide.innerHTML = slideInner(s); wireShots(slide); }
   }
 
   // ── splash — every load, tap to skip, never when motion is reduced ─────────────────────────
