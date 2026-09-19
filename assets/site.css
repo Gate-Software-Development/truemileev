@@ -93,8 +93,13 @@ header.bar{display:flex;align-items:center;gap:8px;padding:12px 0 4px;flex-wrap:
   background:var(--bezel);border:1px solid var(--line);box-shadow:0 20px 46px var(--shadow)}
 .phone .screen{position:absolute;inset:6px;border-radius:23px;background:var(--bg);overflow:hidden;
   display:flex;flex-direction:column}
+/* contain, not cover: a real screenshot arrives with the status bar, the tour's banner and the
+   Android nav bar cropped off, so its aspect is shorter than the frame. Cover would answer that by
+   slicing 14% off each SIDE of the screen. Contained and top-anchored, the whole screen shows and
+   the leftover strip reads as the phone's chin - so it needs the screen's own background, not the
+   bezel's. */
 .phone .shot{position:absolute;inset:6px;border-radius:23px;width:calc(100% - 12px);height:calc(100% - 12px);
-  object-fit:cover;object-position:top center}
+  object-fit:contain;object-position:top center;background:var(--bg)}
 .phone .status{display:flex;justify-content:space-between;padding:6px 10px 2px;font-size:8px;color:var(--dim)}
 .phone .body{flex:1;padding:6px 8px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
 .phone .navbar{display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);padding:5px 2px}
