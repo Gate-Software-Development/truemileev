@@ -6,10 +6,10 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // ── theme: the system's choice if it has one, the clock if it does not ─────────────────────
-  // 06:00-18:00 light, 18:00-06:00 dark, exactly as asked. A manual pick wins over both and is
-  // remembered on this device only.
-  const THEME_KEY = "tm_theme";
+  // ── theme: the system's, with the clock only as a fallback ────────────────────────────
+  // No switch and nothing remembered - the browser already knows what the reader wants, and every
+  // phone flips itself at sunset. The clock only answers for a browser that states no preference at
+  // all (06:00-18:00 light, dark after), which is the rare case, not the rule.
   function clockTheme() {
     const h = new Date().getHours();
     return (h >= 6 && h < 18) ? "light" : "dark";
@@ -19,34 +19,66 @@
     if (window.matchMedia("(prefers-color-scheme: light)").matches) return "light";
     return null;
   }
-  function applyTheme(t) {
-    document.documentElement.setAttribute("data-theme", t);
-    const b = $("#themeBtn");
-    if (b) {
-      b.setAttribute("aria-label", t === "dark" ? "Switch to the light theme" : "Switch to the dark theme");
-      b.innerHTML = t === "dark"
-        ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
-        : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/></svg>';
-    }
-  }
-  let saved = null;
-  try { saved = localStorage.getItem(THEME_KEY); } catch (_) {}
-  let theme = saved || systemTheme() || clockTheme();
-  applyTheme(theme);
-  // Follow the system if it changes while the page is open and nothing was picked by hand.
+  let theme = systemTheme() || clockTheme();
+  document.documentElement.setAttribute("data-theme", theme);
+  // Follow the system live, and redraw the screens so they follow with it.
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", e => {
-    if (!saved) applyTheme(theme = e.matches ? "dark" : "light");
+    theme = e.matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
+    build();
   });
 
   // ── the six (plus Auto), in the app's own bottom-bar order and its own colours ─────────────
   const SCREENS = [
-    { key: "board", label: "Board", color: "var(--c-board)" },
-    { key: "charge", label: "Charge", color: "var(--c-charge)" },
-    { key: "live", label: "Live", color: "var(--c-live)" },
-    { key: "map", label: "Map", color: "var(--c-map)" },
-    { key: "report", label: "Report", color: "var(--c-report)" },
-    { key: "wear", label: "Wear", color: "var(--c-wear)" },
-    { key: "auto", label: "Auto", color: "var(--c-auto)", soon: true },
+    {
+      key: "board", label: "Board", color: "var(--c-board)",
+      headline: "One screen, every number",
+      lede: "A glance tells you what the car actually costs you — every mile, every kilowatt-hour, every dollar, day by day and drive by drive.",
+      detail: "Cost per mile and cost per kWh come from what you actually paid for the energy, charge by charge, at the price on the day. Lifetime sits next to this month — total spent, savings against gas, mi/kWh and MPGe, average speed, drive count, the energy regen handed back, what climate control took — and your last drives sit underneath. Nothing here is typed in; it's measured off the car and added up.",
+      bullets: ["Cost per mile from what you paid", "Lifetime and monthly totals side by side", "Regen recovered and climate cost, measured"],
+    },
+    {
+      key: "charge", label: "Charge", color: "var(--c-charge)",
+      headline: "Every charge, accounted for",
+      lede: "Watch the energy land in real time, then keep the receipt for good.",
+      detail: "Plugged in, the screen follows power, energy delivered and state of charge as they climb; unplugged, it sits idle and waits. When the session ends you get the summary — kWh delivered, what it cost, the rate, the charge you arrived and left with, how long you stood there. Open any past session and its own power curve is there, sampled from your car while it charged, not copied off a spec sheet.",
+      bullets: ["Live power, energy and charge state", "Cost, rate and duration per session", "Every session's own power curve"],
+    },
+    {
+      key: "live", label: "Live", color: "var(--c-live)",
+      headline: "The drive, as it happens",
+      lede: "See what your right foot costs you at the moment it costs it.",
+      detail: "The power gauge swings up under acceleration and falls through zero into regen, so energy going out and energy coming back are one continuous motion. Around it sit speed, state of charge, range, pack and cabin temperature and 12-volt health — and you choose which readouts fill the tiles, because what matters on a mountain pass isn't what matters in traffic. It all comes straight off the adapter, live; when the link drops the gauge falls to zero instead of holding a stale number.",
+      bullets: ["Power gauge reads acceleration and regen", "Choose which readouts fill the tiles", "Pack, cabin and 12-volt health"],
+    },
+    {
+      key: "map", label: "Map", color: "var(--c-map)",
+      headline: "Where you are, where you're going",
+      lede: "Where you've been is drawn on the map; where you can get to is planned on what your car actually does.",
+      detail: "Three faces on one map: the charge locations you've really used, past trips drawn along the roads you actually took, and navigation with your saved places. Plan a route and the stops are sized from your measured range in today's conditions and your car's own charging curve. It tells you where you'd stop, for how long, and what charge you'd arrive with, before you pull out of the driveway.",
+      bullets: ["Charge locations you've actually used", "Past trips drawn as you drove them", "Stops and arrival charge, planned ahead"],
+    },
+    {
+      key: "report", label: "Report", color: "var(--c-report)",
+      headline: "Proof you can hand over",
+      lede: "When someone wants the driving in writing — an accountant, a client, you next April — it's already written.",
+      detail: "Filter by vehicle, category and date range, and the totals for that window come back with the drives behind them. Export the list as CSV, the period as a PDF, or business mileage as a PDF that carries its own verification page. Every row is a drive the app recorded while it was happening, so the total isn't a claim — it's a sum.",
+      bullets: ["Filter by vehicle, category, date range", "CSV, period PDF, mileage PDF", "Business report with verification page"],
+    },
+    {
+      key: "wear", label: "Wear", color: "var(--c-wear)",
+      headline: "Your car, on your wrist",
+      lede: "What the car knows shouldn't be stuck in a phone at the bottom of a bag.",
+      detail: "The watch mirrors the phone: state of charge, range remaining, and the drive being recorded right now, updating as you go. When the drive ends it holds on to where the car stopped, so finding it again in a packed lot is a glance and a walk. Nothing to start, nothing to stop — same as the phone.",
+      bullets: ["Charge and range on your wrist", "The drive in progress, live", "Walk back to where you parked"],
+    },
+    {
+      key: "auto", label: "Auto", color: "var(--c-auto)", soon: true,
+      headline: "Android Auto",
+      lede: "The same drive data on the car's own screen — not released yet.",
+      detail: "Built and running, waiting on release: charge, range and the drive in progress on the head unit, with the places you charge as points of interest. It ships when the phone app leaves closed testing.",
+      bullets: ["Coming after closed testing", "Charge and range on the dash", "Your chargers as places"],
+    },
   ];
 
   // ── icons (inline; nothing loads from anywhere) ────────────────────────────────────────────
@@ -244,7 +276,7 @@
   };
 
   // ── build ──────────────────────────────────────────────────────────────────────────────────
-  const ring = $("#ring"), nav = $("#appnav");
+  const ring = $("#ring"), nav = $("#appnav"), readout = $("#readout");
   const N = SCREENS.length;
   const step = 360 / N;
   let active = 0, radius = 240;
@@ -275,6 +307,7 @@
       </button>`).join("");
     $$("#appnav button").forEach(b => b.onclick = () => select(Number(b.dataset.i)));
     turn();
+    write();
   }
 
   function turn() {
@@ -289,6 +322,19 @@
     active = ((i % N) + N) % N;
     $$("#appnav button").forEach(b => b.setAttribute("aria-selected", String(Number(b.dataset.i) === active)));
     turn();
+    write();
+  }
+
+  // The write-up for whichever screen is at the front.
+  function write() {
+    const s = SCREENS[active];
+    readout.innerHTML = `
+      <div class="fade-in">
+        <h2>${s.headline}</h2>
+        <p class="lede">${s.lede}</p>
+        <p class="detail">${s.detail}</p>
+        <ul>${s.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+      </div>`;
   }
 
   // ── the numbers move, but only on the screen you are looking at ────────────────────────────
@@ -331,12 +377,96 @@
   }
 
   // ── splash — every load, tap to skip, never when motion is reduced ─────────────────────────
+  // ── splash: the app's own, beat for beat ───────────────────────────────────────
+  // Ported from ui/SplashScreen.kt (ElectronSplashScreen). 22 electrons bounce the full screen
+  // while two colliders glide in from opposite edges and meet dead centre; white flash, the bolt
+  // snaps on, the icon springs in, the wordmark rises. Every duration and colour below is the
+  // Kotlin's, not an approximation:
+  //   t=0      22 electrons, r 10-22px scaled by width, #00B0FF / #00E676 alternating,
+  //            glow circle at 2.2r alpha .22 under a solid core
+  //   t=1200   flash to alpha .85 over 90ms; bolt snaps to full opacity
+  //   t=1400   electrons fade over 300ms; icon springs 0 -> 1; bolt fades over 220ms
+  //   t=1580   name + tagline fade in over 700ms, rising 36px; icon pulses 1 -> 1.14 / 480ms
+  //   t=3180   hand off
+  const SPLASH = { collide: 1200, bolt: 200, name: 180, hold: 650 + 50 + 900 };
+
   function splash() {
     const el = $("#splash");
     if (!el) return;
+    const close = () => { el.classList.add("gone"); stop = true; };
     if (reduced) { el.classList.add("gone"); return; }
-    const close = () => el.classList.add("gone");
-    setTimeout(close, 1900);
+
+    const cv = $("#splashCanvas"), ctx = cv && cv.getContext("2d");
+    let stop = false;
+    if (ctx) {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = cv.width = Math.round(innerWidth * dpr);
+      const h = cv.height = Math.round(innerHeight * dpr);
+      cv.style.width = innerWidth + "px";
+      cv.style.height = innerHeight + "px";
+      const cx = w / 2, cy = h / 2;
+      const s = Math.max(w / 1080, 0.7);        // the Kotlin's own width scale
+      const rnd = Math.random;
+
+      const parts = [];
+      for (let i = 0; i < 22; i++) {
+        const r = (10 + rnd() * 12) * s;
+        const a = rnd() * Math.PI * 2;
+        const spd = (0.34 + rnd() * 0.34) * Math.max(w / 1080, 0.65);
+        parts.push({
+          x: r + rnd() * (w - 2 * r), y: r + rnd() * (h - 2 * r),
+          vx: Math.cos(a) * spd, vy: Math.sin(a) * spd,
+          c: i % 2 === 0 ? "#00B0FF" : "#00E676", r: r, hit: false,
+        });
+      }
+      // Two colliders, bearings 100°-260° apart, starting off-screen along them.
+      const base = rnd() * Math.PI * 2;
+      const sep = (100 + rnd() * 160) * Math.PI / 180;
+      const L = Math.hypot(w, h) * 0.6;
+      [base, base + sep].forEach((a, k) => {
+        const sx = cx + L * Math.cos(a), sy = cy + L * Math.sin(a);
+        parts.push({ x: sx, y: sy, sx: sx, sy: sy, r: 22 * s,
+                     c: k === 0 ? "#00B0FF" : "#00E676", hit: true });
+      });
+
+      let t0 = 0, last = 0;
+      const draw = (now) => {
+        if (stop) return;
+        if (!t0) { t0 = now; last = now; }
+        const t = now - t0;
+        const dt = Math.min(Math.max(now - last, 1), 40);
+        last = now;
+        ctx.clearRect(0, 0, w, h);
+        for (const e of parts) {
+          if (e.hit) {
+            const p = Math.min(t / SPLASH.collide, 1);
+            const ease = p * p * (3 - 2 * p);       // smoothstep, as in the Kotlin
+            e.x = e.sx + (cx - e.sx) * ease;
+            e.y = e.sy + (cy - e.sy) * ease;
+          } else {
+            e.x += e.vx * dt; e.y += e.vy * dt;
+            if (e.x < e.r) { e.x = e.r; e.vx = -e.vx; }
+            if (e.x > w - e.r) { e.x = w - e.r; e.vx = -e.vx; }
+            if (e.y < e.r) { e.y = e.r; e.vy = -e.vy; }
+            if (e.y > h - e.r) { e.y = h - e.r; e.vy = -e.vy; }
+          }
+          ctx.globalAlpha = 0.22;
+          ctx.fillStyle = e.c;
+          ctx.beginPath(); ctx.arc(e.x, e.y, e.r * 2.2, 0, 6.2832); ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, 6.2832); ctx.fill();
+        }
+        if (t < SPLASH.collide + 400) requestAnimationFrame(draw);
+      };
+      requestAnimationFrame(draw);
+    }
+
+    const at = (ms, fn) => setTimeout(() => { if (!stop) fn(); }, ms);
+    at(SPLASH.collide, () => el.classList.add("hit"));                       // flash + bolt
+    at(SPLASH.collide + SPLASH.bolt, () => el.classList.add("icon"));        // icon springs in
+    at(SPLASH.collide + SPLASH.bolt + SPLASH.name, () => el.classList.add("named"));
+    at(SPLASH.collide + SPLASH.bolt + SPLASH.name + SPLASH.hold, close);
+
     el.addEventListener("click", close);
     document.addEventListener("keydown", close, { once: true });
   }
@@ -345,13 +475,6 @@
   splash();
   build();
 
-  $("#themeBtn").onclick = () => {
-    theme = (document.documentElement.getAttribute("data-theme") === "dark") ? "light" : "dark";
-    saved = theme;
-    try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
-    applyTheme(theme);
-    build();   // the screens follow the theme
-  };
 
   document.addEventListener("keydown", e => {
     if (e.key === "ArrowRight") select(active + 1);

@@ -4,19 +4,27 @@
 <title>TrueMile EV — the EV logbook that learns your vehicle</title>
 <meta name="description" content="TrueMile EV connects to your car's OBD adapter and records every drive and charge automatically: true cost per mile, real range, your own charging curve, battery health, and a trip planner built on your driving instead of lab numbers.">
 <meta name="color-scheme" content="dark light">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M10 12 h18 a20 20 0 0 1 0 40 h-18 z" fill="%231e88d2"/><circle cx="52" cy="32" r="6" fill="%2300e676"/></svg>'>
+<link rel="icon" href="assets/icon.png">
 <link rel="stylesheet" href="assets/site.css">
 </head><body>
 
-<!-- Splash — the app's own opening, on every load. Tap or press a key to skip; skipped entirely
-     when the browser asks for reduced motion. -->
+<!-- Splash — the app's own opening, ported beat for beat from ui/SplashScreen.kt: electrons
+     bounce, two collide dead centre, white flash, the bolt snaps on, the icon springs in and the
+     wordmark rises. Tap or press a key to skip; skipped entirely under reduced motion. -->
 <div id="splash">
-  <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
-    <path d="M10 12 h18 a20 20 0 0 1 0 40 h-18 z" fill="#1e88d2"/>
-    <circle class="pulse" cx="52" cy="32" r="6" fill="#00e676"/>
-  </svg>
-  <div class="name">TrueMile <span>EV</span></div>
-  <div class="tag">the EV logbook that learns your vehicle</div>
+  <canvas id="splashCanvas" aria-hidden="true"></canvas>
+  <div class="flash" aria-hidden="true"></div>
+  <div class="lockup">
+    <!-- the app's own bolt, drawable/ic_splash_bolt.xml, path for path -->
+    <svg class="bolt" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M29 2 L13 26 L23 26 L19 46 L37 22 L27 22 Z" fill="#fff"/>
+    </svg>
+    <img class="mark" src="assets/icon.png" alt="TrueMile EV" width="192" height="192">
+  </div>
+  <div class="name">
+    <div class="word">TRUEMILE <span>EV</span></div>
+    <div class="tag">Know every mile. Control every cost.</div>
+  </div>
   <div class="skip">tap to continue</div>
 </div>
 
@@ -27,7 +35,6 @@
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5c0-3-4-5.5-9-5.5z"/></svg>
       Sign in
     </a>
-    <button id="themeBtn" class="btn icon" type="button" aria-label="Switch theme"></button>
     <div class="stores">
       <a class="btn" href="https://play.google.com/store/apps/details?id=com.gateengineering.truemileev">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 2.5v19l11-9.5-11-9.5zm13.2 7.1 2.9 2.4-2.9 2.4-2.8-2.4 2.8-2.4z"/></svg>
@@ -47,19 +54,7 @@
     <div id="ring" class="ring"></div>
   </div>
   <div id="appnav" class="appnav" role="tablist" aria-label="Choose a screen"></div>
-
-  <section>
-    <h3 class="sec">How we build</h3>
-    <div class="promise">
-      <div><b>No ads. No trackers.</b><span>Zero analytics SDKs in anything we ship — verified, not
-      promised. This page included: no third-party scripts, no fonts fetched from elsewhere, nothing
-      that phones home.</span></div>
-      <div><b>Your data is yours.</b><span>Collected only to power your own features. Deletable any
-      time, from inside the app.</span></div>
-      <div><b>Real data beats ratings.</b><span>Every figure comes from what your car actually did —
-      not from what a lab assumed it would do.</span></div>
-    </div>
-  </section>
+  <div id="readout" class="readout" aria-live="polite"></div>
 
   <section>
     <h3 class="sec">What you need</h3>
